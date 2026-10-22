@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fetch-hackkit"
-version = "0.1.0"
+version = "0.2.0"
 description = "Batteries for Fetch.ai hackathon agents: chat protocol, ASI:One interactive cards, ASI:One LLM + tools, payments, MCP, and Agentverse registration."
 readme = "README.md"
 license = "MIT"
