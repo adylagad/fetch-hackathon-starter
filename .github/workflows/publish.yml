@@ -1,0 +1,26 @@
+name: Publish fetch-hackkit
+
+# Push a tag like `fetch-hackkit-v0.1.0` to publish. Uses PyPI trusted publishing:
+# no API token is stored in this repo.
+on:
+  push:
+    tags: ["fetch-hackkit-v*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Check tag matches package version
+        run: |
+          version=$(grep -m1 '^version' packages/fetch-hackkit/pyproject.toml | cut -d'"' -f2)
+          test "${GITHUB_REF_NAME}" = "fetch-hackkit-v${version}"
+      - run: uv sync --all-packages
+      - run: uv run pytest -q
+      - run: uv build --package fetch-hackkit -o dist
+      - run: uv publish --trusted-publishing always dist/*
