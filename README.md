@@ -13,30 +13,47 @@ Everything you need to build a Fetch.ai agent that works inside ASI:One. It has:
   - **MCP tools**;
   - **agent-to-agent** calls;
   - **Agentverse registration**, including your `@handle`.
-- **Hackkit Guide**, a showcase agent built on it. Clone it and turn it into your project.
+- **`hackkit new`**, which generates a minimal, ready-to-run agent project in one command.
+- **Hackkit Guide**, a showcase agent with a working demo of every feature, to copy patterns from.
 - **AI coding setup**: `AGENTS.md` plus ready-made configs, so opencode (running on your ASI:One credits), Claude Code or Cursor can write correct Fetch.ai code from the first prompt.
 
 > Status: early. Built for Cal Hacks 13.0. Not an official Fetch.ai project (yet).
 
 ## Quick start (5 minutes)
 
-You need [uv](https://docs.astral.sh/uv/) and Python 3.11+.
+You need [uv](https://docs.astral.sh/uv/) and Python 3.11+, plus two keys: [ASI:One](https://asi1.ai/developer) and [Agentverse](https://agentverse.ai/profile/api-keys).
+
+### Option A: a fresh project (recommended)
 
 ```bash
-git clone https://github.com/adylagad/fetch-hackathon-starter
-cd fetch-hackathon-starter
-uv sync --all-packages
-
-cd agent
-cp .env.example .env
-uv run hackkit seed            # paste the AGENT_SEED_PHRASE line into .env
-uv run hackkit handle my-team-agent   # pick a free @handle, put it in AGENT_HANDLE
-# add ASI_ONE_API_KEY (asi1.ai/developer) and AGENTVERSE_API_KEY (agentverse.ai/profile/api-keys)
-
+uvx --from "fetch-hackkit[mcp]" hackkit new "Trip Planner"
+cd trip-planner
+# paste ASI_ONE_API_KEY and AGENTVERSE_API_KEY into .env
+uv sync
 uv run python agent.py
 ```
 
-With `AGENTVERSE_API_KEY` set, the agent connects itself to Agentverse and publishes its profile. Open [asi1.ai](https://asi1.ai), say `@my-team-agent hi`, and tap through the demo.
+`hackkit new` creates:
+- an agent with a menu card and an ASI:One tool;
+- a fresh seed in `.env` and a free `@handle` (it checks Agentverse);
+- a README in Agentverse-profile shape, with the badges and your agent's address;
+- tests, a `Dockerfile`, and `AGENTS.md` plus opencode, Claude Code and Cursor configs.
+
+On startup the agent connects itself to Agentverse. Open [asi1.ai](https://asi1.ai) and say `@trip-planner hi` (use the handle `hackkit new` printed).
+
+### Option B: start from the full showcase
+
+Click **Use this template** on GitHub (or clone), then:
+
+```bash
+uv sync --all-packages
+cd agent
+cp .env.example .env
+uv run hackkit seed                   # paste the AGENT_SEED_PHRASE line into .env
+uv run hackkit handle my-team-agent   # pick a free @handle, put it in AGENT_HANDLE
+# add ASI_ONE_API_KEY and AGENTVERSE_API_KEY
+uv run python agent.py
+```
 
 ## What the showcase agent demonstrates
 
@@ -86,6 +103,17 @@ opencode            # uses opencode.json: ASI:One models + the Agentverse MCP
 
 See [docs/coding-agents.md](docs/coding-agents.md) for opencode, Claude Code, Cursor, Cline, aider and others.
 
+## Keep it online for judging
+
+A mailbox agent answers only while it runs, but it needs nothing except outbound internet. Run the included `Dockerfile` on any always-on host as a background worker:
+
+```bash
+docker build -t my-agent .
+docker run -d --restart unless-stopped --env-file .env my-agent   # agent/.env for the showcase
+```
+
+Details: [AGENTS.md → Keeping your agent online](AGENTS.md#keeping-your-agent-online).
+
 ## Before you submit
 
 ```bash
@@ -102,12 +130,13 @@ cd agent && uv run hackkit doctor --readme ../README.md
 ## Repo layout
 
 ```
-packages/fetch-hackkit/   the library (published to PyPI as fetch-hackkit)
+packages/fetch-hackkit/   the library (PyPI: fetch-hackkit), incl. `hackkit new` templates
 agent/                    the showcase agent: start here
 AGENTS.md                 reference for humans and coding agents (CLAUDE.md links here)
 opencode.json             opencode: ASI:One provider + Agentverse MCP
 .mcp.json, .cursor/       Agentverse MCP for Claude Code / Cursor
 docs/coding-agents.md     coding agents on ASI:One
+Dockerfile                runs the showcase agent on an always-on host
 ```
 
 ## Development

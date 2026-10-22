@@ -10,6 +10,14 @@ Batteries for [Fetch.ai](https://fetch.ai) hackathon agents. Build a uAgent that
 - **Multi-agent**: `ask_agent(ctx, "@handle", "question")`.
 - **Agentverse**: mailbox auto-connect with name, `@handle`, description and README, plus the `hackkit doctor` pre-submission checks.
 
+Start a new project in one command (fresh seed, a free `@handle`, README, tests, Dockerfile, AGENTS.md and coding-agent configs):
+
+```bash
+uvx --from "fetch-hackkit[mcp]" hackkit new "Trip Planner"
+```
+
+Or add it to an existing project:
+
 ```bash
 pip install fetch-hackkit          # or: pip install "fetch-hackkit[mcp]"
 ```
@@ -39,6 +47,7 @@ Environment (`.env` is loaded automatically):
 ## CLI
 
 ```
+hackkit new NAME        create a ready-to-run agent project
 hackkit seed            generate a secure seed phrase (+ its address and wallet)
 hackkit whoami          address, wallet and Agentverse profile URL for your seed
 hackkit handle NAME     is @NAME free on Agentverse?
