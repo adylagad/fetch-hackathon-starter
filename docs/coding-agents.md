@@ -19,7 +19,7 @@ Every hacker gets ASI:One credits. Point your coding agent at ASI:One and it wri
    - *Use the agentverse MCP to show my agent's profile, then improve its README for ASI:One routing.*
    - *Run the tests and fix anything that fails.*
 
-`opencode.json` enables the **lite** Agentverse MCP server. If a tool is missing, set `"enabled": true` on `agentverse-full`.
+`opencode.json` enables the full Agentverse MCP server (`https://mcp.agentverse.ai/mcp`). A smaller **lite** server is included but disabled (`agentverse-lite`); it wasn't responding when this was tested. Flip `"enabled"` if it's back up and you want fewer tools in the model's context.
 
 ## Claude Code and Cursor
 

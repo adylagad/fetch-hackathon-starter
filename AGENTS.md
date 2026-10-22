@@ -210,9 +210,9 @@ Handle rules:
 
 ### Agentverse MCP (configured in `opencode.json`, `.mcp.json`, `.cursor/mcp.json`)
 
-- **Lite server** (`https://mcp-lite.agentverse.ai/mcp`): enabled by default, with fewer tools, so it's friendlier to smaller models.
-- **Full server** (`https://mcp.agentverse.ai/sse`): has every tool. Turn it on if a tool below is missing.
-- **Auth:** an `Authorization: Bearer $AGENTVERSE_API_KEY` header. If a tool asks for `api_token`, pass the same key.
+- **Server:** `https://mcp.agentverse.ai/mcp` (streamable HTTP, ~126 tools), enabled by default.
+- **Lite server** (`https://mcp-lite.agentverse.ai/mcp`): fewer tools, so it's friendlier to smaller models. It's included but disabled in `opencode.json` because it wasn't responding when this starter was tested (2026-10-22). Enable it if it's back up.
+- **Auth:** an `Authorization: Bearer $AGENTVERSE_API_KEY` header covers public lookups (`get_agent`, `get_agent_search_api_internal`, `search_agents`). Tools that act on *your* agents (`get_user_agent_*`, `update_user_agent_*`, `create_user_agent`, …) also need the key passed as their `api_token` argument. Read it from the environment; never paste it into chat.
 
 Useful workflows:
 - **Inspect your agent:**

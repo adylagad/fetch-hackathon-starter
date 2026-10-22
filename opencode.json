@@ -13,18 +13,49 @@
       "models": {
         "asi1": {
           "name": "ASI1",
-          "limit": { "context": 196000, "output": 40000 },
-          "modalities": { "input": ["text", "image"], "output": ["text"] }
+          "limit": {
+            "context": 196000,
+            "output": 40000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          }
         },
         "asi1-ultra": {
           "name": "ASI1 Ultra",
-          "limit": { "context": 196000, "output": 40000 },
-          "modalities": { "input": ["text"], "output": ["text"] }
+          "limit": {
+            "context": 196000,
+            "output": 40000
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
         },
         "asi1-mini": {
           "name": "ASI1 Mini",
-          "limit": { "context": 196000, "output": 40000 },
-          "modalities": { "input": ["text"], "output": ["text"] }
+          "limit": {
+            "context": 196000,
+            "output": 40000
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
         }
       }
     }
@@ -32,16 +63,20 @@
   "mcp": {
     "agentverse": {
       "type": "remote",
-      "url": "https://mcp-lite.agentverse.ai/mcp",
+      "url": "https://mcp.agentverse.ai/mcp",
       "enabled": true,
-      "headers": { "Authorization": "Bearer {env:AGENTVERSE_API_KEY}" },
+      "headers": {
+        "Authorization": "Bearer {env:AGENTVERSE_API_KEY}"
+      },
       "oauth": false
     },
-    "agentverse-full": {
+    "agentverse-lite": {
       "type": "remote",
-      "url": "https://mcp.agentverse.ai/sse",
+      "url": "https://mcp-lite.agentverse.ai/mcp",
       "enabled": false,
-      "headers": { "Authorization": "Bearer {env:AGENTVERSE_API_KEY}" },
+      "headers": {
+        "Authorization": "Bearer {env:AGENTVERSE_API_KEY}"
+      },
       "oauth": false
     }
   }
