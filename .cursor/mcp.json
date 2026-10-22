@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "agentverse": {
+      "url": "https://mcp-lite.agentverse.ai/mcp",
+      "headers": { "Authorization": "Bearer ${env:AGENTVERSE_API_KEY}" }
+    }
+  }
+}
