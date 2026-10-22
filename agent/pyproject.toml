@@ -1,0 +1,12 @@
+[project]
+name = "hackkit-guide-agent"
+version = "0.1.0"
+description = "Showcase agent for fetch-hackkit: cards, ASI:One tools, payments, MCP, agent-to-agent."
+requires-python = ">=3.11"
+dependencies = ["fetch-hackkit[mcp]"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+fetch-hackkit = { workspace = true }
