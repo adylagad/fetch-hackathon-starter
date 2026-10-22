@@ -1,0 +1,33 @@
+# AGENTS.md
+
+Guide for AI coding agents (opencode, Claude Code, Cursor, Codex, and others) working in this project. Humans: this is also the fastest complete reference.
+
+You are helping a hackathon team build a **Fetch.ai agent** called **__AGENT_NAME__** (`@__AGENT_HANDLE__`). To win, the agent must:
+- be registered on **Agentverse**;
+- be discoverable and usable inside **ASI:One** chat (the Agent Chat Protocol);
+- do real work: tools, APIs, MCP, or other agents;
+- ideally use **interactive cards** and the **Payment Protocol**.
+
+The `fetch-hackkit` package does the plumbing. Write agent code against it.
+
+## Project map
+
+| Path | What it is |
+|---|---|
+| `agent.py` | The agent: `HackAgent`, its handlers, cards and tools. Start here. |
+| `README.md` | Shown on the Agentverse profile; ASI:One reads it to route users here. Keep it specific. |
+| `tests/` | Tests. At minimum, every card you send must pass `cards.validate`. |
+| `.env` | Secrets and identity (gitignored). `.env.example` documents every variable. |
+| `Dockerfile` | Runs the agent on an always-on host (see *Keeping your agent online*). |
+
+## Commands
+
+```bash
+uv sync                                # install (Python 3.11+)
+uv run python agent.py                 # run the agent
+uv run hackkit whoami                  # address, wallet, Agentverse profile URL
+uv run hackkit handle my-agent         # is @my-agent free on Agentverse?
+uv run hackkit doctor                  # pre-submission checks
+uv run pytest -q && uv run ruff check .
+```
+

@@ -20,6 +20,22 @@ You are helping a hackathon team build a **Fetch.ai agent**. To win, the agent m
 | `agent/peer/agent.py` | A second, minimal agent for multi-agent demos |
 | `agent/README.md` | The README Agentverse shows on your profile. ASI:One reads it to route users to you. |
 | `agent/.env.example` | Every environment variable, documented |
+| `packages/fetch-hackkit/src/fetch_hackkit/templates/` | What `hackkit new` generates. `agents_reference.md` must stay identical to this file from *Golden rules* down (a test checks). |
+| `Dockerfile` | Runs the showcase agent on an always-on host |
+
+## Commands
+
+```bash
+uv sync --all-packages                 # install everything (Python 3.11-3.14)
+cd agent && cp .env.example .env       # then fill it in
+uv run hackkit new "Trip Planner"      # or: generate a fresh minimal project elsewhere
+uv run hackkit seed                    # generate AGENT_SEED_PHRASE (+ shows address and wallet)
+uv run hackkit handle my-agent         # is @my-agent free on Agentverse?
+uv run python agent.py                 # run the agent (from agent/)
+uv run hackkit whoami                  # address, wallet, Agentverse profile URL
+uv run hackkit doctor --readme README.md   # pre-submission checks
+uv run pytest -q && uv run ruff check . && uv run mypy   # from repo root
+```
 
 ## Golden rules
 
@@ -32,19 +48,6 @@ You are helping a hackathon team build a **Fetch.ai agent**. To win, the agent m
 5. **Keep per-conversation state in `ctx.storage`, keyed by `msg.session`.** ASI:One sends your agent one message at a time.
 6. **Every card has a narration.** It's the fallback text if a card fails to render.
 7. **Run `uv run pytest -q` and `uv run ruff check .` after changes.**
-
-## Commands
-
-```bash
-uv sync --all-packages                 # install everything (Python 3.11-3.14)
-cd agent && cp .env.example .env       # then fill it in
-uv run hackkit seed                    # generate AGENT_SEED_PHRASE (+ shows address and wallet)
-uv run hackkit handle my-agent         # is @my-agent free on Agentverse?
-uv run python agent.py                 # run the agent (from agent/)
-uv run hackkit whoami                  # address, wallet, Agentverse profile URL
-uv run hackkit doctor --readme README.md   # pre-submission checks
-uv run pytest -q && uv run ruff check . && uv run mypy   # from repo root
-```
 
 ## The agent pattern
 
@@ -180,7 +183,7 @@ from fetch_hackkit.peers import ask_agent, PeerError
 reply = await ask_agent(ctx, "@some-handle", "question", timeout=60)  # or an agent1... address
 ```
 
-`ask_agent` works with any chat-protocol agent on Agentverse. `agent/peer/agent.py` is a template for your own specialist agent. Run it, then set `PEER_AGENT` to its address.
+`ask_agent` works with any chat-protocol agent on Agentverse. For your own specialist, run a second `HackAgent` with its own seed and port, then call it by address or `@handle`.
 
 ## Registration and the Agentverse profile
 
@@ -219,7 +222,7 @@ Useful workflows:
   - `get_user_agent_details` / `get_agent` with your address;
   - `agent_readiness_probe_mailbox` (mailbox) / `agent_readiness_probe` (hosted).
 - **Edit your profile:** `update_user_agent_mailbox(address, name, short_description, readme)`.
-- **Hosted agent** (runs on Agentverse, no laptop): `create_user_agent` → `update_user_agent_code` → `start_specific_user_agent` → `get_latest_logs_for_user_agent`. Hosted agents can't import `fetch-hackkit`; copy the pattern instead.
+- **Hosted agent** (runs on Agentverse, no laptop): `create_user_agent` → `update_user_agent_code` → `start_specific_user_agent` → `get_latest_logs_for_user_agent`. See *Keeping your agent online* for the catch.
 - **Discoverability:**
   - `search_agents` with the words a user would type, to see where you rank;
   - `start_agent_seo_eval` → `get_agent_seo_eval_results` to see how well ASI:One can match you.
@@ -230,9 +233,26 @@ ASI:One routes users by your **name, description, README and handle**:
 - Write the README for routing: what the agent does, concrete example prompts, and the domains it covers.
 - Keep the agent running (status `active`). A stopped mailbox agent isn't routed to.
 
+## Keeping your agent online
+
+A mailbox agent only answers while its process is running. Judges will message yours, so plan for it.
+
+- **It needs only outbound internet:** no public URL, no open ports, no domain.
+- **While hacking:** run it on your laptop. On macOS, keep the laptop awake with `caffeinate -i uv run python agent.py`.
+- **For judging and after:** run the `Dockerfile` on any always-on host as a *background worker* (no HTTP service), with your `.env` values as environment variables:
+  ```bash
+  docker build -t my-agent .
+  docker run -d --restart unless-stopped --env-file .env my-agent
+  ```
+  Any container host works: a small VM, Render (Background Worker), Railway, Fly.io Machines.
+- **Run exactly one copy per seed.** Two processes with the same seed poll the same mailbox and split your messages.
+- **`ctx.storage` is a local JSON file.** On hosts with throwaway disks it resets on redeploy. That's fine for a demo; use a database for anything you must keep.
+- **Agentverse-hosted agents** (`create_user_agent` via MCP) run in Agentverse's own sandbox with a fixed set of packages, so they can't install `fetch-hackkit`. Prefer the mailbox + Docker route.
+
 ## Submission checklist (Fetch.ai prize)
 
 - [ ] Registered on Agentverse, status active, chat protocol published. `hackkit doctor` checks all of this.
+- [ ] The agent stays online through judging (see *Keeping your agent online*).
 - [ ] Works end-to-end inside ASI:One chat, with no custom frontend.
 - [ ] Real tool use, MCP, or multi-agent orchestration, not just one LLM call.
 - [ ] (Bonus) Interactive cards, the Payment Protocol, and error handling and recovery.

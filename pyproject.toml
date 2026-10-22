@@ -41,4 +41,4 @@ files = ["packages/fetch-hackkit/src", "agent/agent.py", "agent/flows"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["packages/fetch-hackkit/tests", "agent/tests"]
+testpaths = ["packages/fetch-hackkit/tests", "agent/tests", "tests"]

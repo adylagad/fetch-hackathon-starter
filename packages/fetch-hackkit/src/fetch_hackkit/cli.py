@@ -1,4 +1,4 @@
-"""``hackkit`` command line: seed, whoami, handle, doctor."""
+"""``hackkit`` command line: new, seed, whoami, handle, doctor."""
 
 from __future__ import annotations
 
@@ -51,6 +51,37 @@ def _handle(args: argparse.Namespace) -> int:
     return 1
 
 
+def _new(args: argparse.Namespace) -> int:
+    from .scaffold import create_project
+
+    try:
+        project = create_project(
+            args.name,
+            directory=Path(args.dir) if args.dir else None,
+            handle=args.handle,
+            check_handle=not args.no_check,
+        )
+    except (FileExistsError, ValueError) as exc:
+        print(f"❌ {exc}")
+        return 1
+    try:
+        where = project.path.relative_to(Path.cwd())
+    except ValueError:
+        where = project.path
+    print(f"✅ Created {project.name} in {where}/")
+    print(f"   handle:  @{project.handle} ({project.handle_note})")
+    print(f"   address: {project.address}")
+    print("   identity: a fresh seed is in .env (never commit it)\n")
+    print("Next:")
+    print(f"  cd {where}")
+    print("  # add ASI_ONE_API_KEY and AGENTVERSE_API_KEY to .env")
+    print("  uv sync")
+    print("  uv run python agent.py")
+    print(f"  # then on https://asi1.ai say: @{project.handle} hi")
+    print("\nCoding agent: run `opencode` here (ASI:One + Agentverse MCP), or Claude Code/Cursor.")
+    return 0
+
+
 def _doctor(args: argparse.Namespace) -> int:
     from .doctor import run
 
@@ -69,6 +100,12 @@ def main(argv: list[str] | None = None) -> int:
     load_dotenv(find_dotenv(usecwd=True))
     parser = argparse.ArgumentParser(prog="hackkit", description="Fetch.ai hackathon helpers")
     sub = parser.add_subparsers(dest="cmd", required=True)
+    p = sub.add_parser("new", help="create a ready-to-run agent project")
+    p.add_argument("name", help='agent name, e.g. "Trip Planner"')
+    p.add_argument("--dir", help="where to create it (default: ./<name-slug>)")
+    p.add_argument("--handle", help="Agentverse @handle (default: from the name)")
+    p.add_argument("--no-check", action="store_true", help="don't check handle availability")
+    p.set_defaults(fn=_new)
     sub.add_parser("seed", help="generate a secure seed phrase + show its address").set_defaults(
         fn=_seed
     )
