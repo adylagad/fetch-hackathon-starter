@@ -206,6 +206,7 @@ Handle rules:
 - 1–40 characters: letters, digits, `-`, `_` and `.`.
 - Unique across all of Agentverse.
 - Check availability first with `uv run hackkit handle <name>`. A taken handle fails registration with HTTP 409.
+- Agentverse only applies `handle` when it *updates* an existing agent, not when it first creates one. `HackAgent`'s auto-connect checks and re-sends for you. If you connect another way (e.g. the inspector button), restart the agent once or run `hackkit doctor` to confirm the handle stuck.
 
 ### Agentverse MCP (configured in `opencode.json`, `.mcp.json`, `.cursor/mcp.json`)
 
@@ -251,4 +252,5 @@ ASI:One routes users by your **name, description, README and handle**:
 | Card shows as plain text | The card is invalid. Look for `CardError` in the logs. |
 | Button tap ignored | No `@agent.on_action` for that action, so it falls through to `on_text`. Check `msg.selection`. |
 | Payment "not found" | The transaction is still indexing; the kit retries 3 times. On mainnet, check `FET_NETWORK`. |
+| Log warns `not enough funds to register on Almanac contract` | Harmless. Agentverse (API) registration is what ASI:One uses; the on-chain contract registration is optional. |
 | `There is no current event loop` (Python 3.14) | Use `HackAgent`, which creates the loop for you, or run on Python 3.13 |

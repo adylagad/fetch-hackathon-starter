@@ -6,7 +6,11 @@
 
 An interactive tour of building agents on Fetch.ai, run entirely inside ASI:One chat. It shows interactive cards, ASI:One tool calling, FET payments through the Payment Protocol, MCP tools, and agent-to-agent delegation, and it answers questions about building agents.
 
-**Agent address:** `agent1...`. Replace this with the output of `uv run hackkit whoami`.
+**Handle:** `@hackkit-guide`
+
+**Agent address:** `agent1qw9zhjgy7gchd902gwal5gs57z7h4l26vskgx6al0h8k35wajhf5unmr2gj`
+
+_Building your own? Replace these with your handle and the output of `uv run hackkit whoami`._
 
 ## What it can do
 
