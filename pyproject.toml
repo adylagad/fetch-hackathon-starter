@@ -1,0 +1,44 @@
+[project]
+name = "fetch-hackathon-starter"
+version = "0.1.0"
+description = "Starter pack for Fetch.ai hackathons: fetch-hackkit + a showcase agent."
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/fetch-hackkit", "agent"]
+
+[dependency-groups]
+dev = [
+  "mypy>=1.13",
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "ruff>=0.8",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.format]
+exclude = ["*.md"]  # keep doc snippets compact
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"agent/**" = ["E501"]  # user-facing copy reads better unwrapped
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+check_untyped_defs = true
+mypy_path = "agent"
+files = ["packages/fetch-hackkit/src", "agent/agent.py", "agent/flows"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["packages/fetch-hackkit/tests", "agent/tests"]
