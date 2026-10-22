@@ -131,9 +131,26 @@ async def connect_mailbox(
             resp = await client.post(av.identity_api, json=proof)
             if resp.status_code != 200:
                 return ConnectResult(False, "identity proof: " + _detail(resp), agent.address)
-            resp = await client.post(av.agents_api, content=_registration_body(agent, endpoint))
+            body = _registration_body(agent, endpoint)
+            resp = await client.post(av.agents_api, content=body)
             if resp.status_code not in (200, 201):
                 return ConnectResult(False, "register: " + _detail(resp), agent.address)
+            handle = agent._handle
+            if handle:
+                # Agentverse ignores `handle` when it first creates an agent and only
+                # applies it on an update, so read it back and send the update if needed.
+                record = await client.get(f"{av.agents_api}/{agent.address}")
+                if record.status_code == 200 and record.json().get("handle") != handle:
+                    resp = await client.post(av.agents_api, content=body)
+                    if resp.status_code not in (200, 201):
+                        return ConnectResult(False, "set handle: " + _detail(resp), agent.address)
+                    record = await client.get(f"{av.agents_api}/{agent.address}")
+                    if record.status_code == 200 and record.json().get("handle") != handle:
+                        return ConnectResult(
+                            True,
+                            f"connected, but Agentverse did not apply @{handle}",
+                            agent.address,
+                        )
         except httpx.HTTPError as exc:
             return ConnectResult(False, f"network error: {exc}", agent.address)
     return ConnectResult(True, "", agent.address)
@@ -166,13 +183,15 @@ def register_endpoint_agent(agent: Agent, endpoint: str, *, api_key: str | None 
     seed = os.getenv("AGENT_SEED_PHRASE")
     if not seed:
         raise ValueError("AGENT_SEED_PHRASE is not set")
-    return register_agent(
-        request,
-        AgentverseConfig(),
-        RegistrationRequestCredentials(
-            agentverse_api_key=_api_key(api_key), agent_seed_phrase=seed
-        ),
+    credentials = RegistrationRequestCredentials(
+        agentverse_api_key=_api_key(api_key), agent_seed_phrase=seed
     )
+    ok = register_agent(request, AgentverseConfig(), credentials)
+    record = lookup_agent(agent.address, api_key=api_key) if agent._handle else None
+    if record is not None and record.get("handle") != agent._handle:
+        # The handle only applies on update (see connect_mailbox).
+        ok = register_agent(request, AgentverseConfig(), credentials)
+    return ok
 
 
 def lookup_agent(address: str, *, api_key: str | None = None) -> dict[str, Any] | None:

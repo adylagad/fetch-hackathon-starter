@@ -334,5 +334,7 @@ class HackAgent(Agent):
         result = await connect_mailbox(self)
         if result.ok:
             ctx.logger.info(f"Connected to Agentverse as {result.profile_url}")
+            if result.detail:
+                ctx.logger.warning(result.detail)
         else:
             ctx.logger.error(f"Agentverse connect failed: {result.detail}")

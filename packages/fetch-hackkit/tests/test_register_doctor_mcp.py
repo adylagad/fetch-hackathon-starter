@@ -100,3 +100,34 @@ async def test_mcp_tools_are_usable_by_run_tools(mcp_server) -> None:
     assert [t.name for t in tools] == ["calc_add"]
     assert tools[0].parameters["required"] == ["a", "b"]
     assert await tools[0].call({"a": 2, "b": 3}) == {"result": 5}
+
+
+async def test_connect_mailbox_resends_until_handle_applies(monkeypatch) -> None:
+    from fetch_hackkit import HackAgent
+
+    agent = HackAgent("h", handle="my-handle", mailbox=True, auto_connect=False, port=8995)
+    state = {"posts": 0, "handle": None}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        if path.endswith("/challenge"):
+            return httpx.Response(200, json={"challenge": "abc"})
+        if path == "/v2/identity":
+            return httpx.Response(200, json={})
+        if path == "/v2/agents" and request.method == "POST":
+            state["posts"] += 1
+            if state["posts"] > 1:  # Agentverse applies the handle on update only
+                state["handle"] = "my-handle"
+            return httpx.Response(200, json={"success": True})
+        return httpx.Response(200, json={"address": agent.address, "handle": state["handle"]})
+
+    real_client = httpx.AsyncClient
+    monkeypatch.setattr(
+        httpx,
+        "AsyncClient",
+        lambda **kw: real_client(transport=httpx.MockTransport(handler), **kw),
+    )
+    monkeypatch.setenv("AGENTVERSE_API_KEY", "test-key")
+    result = await register.connect_mailbox(agent)
+    assert result.ok and result.detail == ""
+    assert state == {"posts": 2, "handle": "my-handle"}
